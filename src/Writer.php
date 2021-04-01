@@ -3,7 +3,9 @@
 namespace MarkdownWriter;
 
 class Writer {
-	
+
+	const LIST_TYPE_OL = "ol";
+	const LIST_TYPE_UL = "ul";	
 	/**
 	 * The markdown string
 	 * @var string
@@ -193,16 +195,146 @@ class Writer {
 	 * @return $this
 	 */
 	public function block($string) {
+		$this->addNewlineIfMarkdownNotEmpty();
+		return $this->write($string)->nl();
+	}
+
+	/**
+	 * Adds a newline if not the first element
+	 */
+	protected function addNewlineIfMarkdownNotEmpty() {
 		if (!empty($this->markdown)) {
 			$this->nl();
 		}
-		return $this->write($string)->nl(2);
 	}
 
+	/**
+	 * Get the markdown string
+	 * @return string
+	 */
 	public function markdown() {
 		return $this->markdown;
 	}
 
+	/**
+	 * Write an unordered list
+	 * @param  array   $listItems
+	 * @param  boolean $loose
+	 * @return $this
+	 */
+	public function ul(array $listItems, $loose = false) {
+		$this->addNewlineIfMarkdownNotEmpty();
+		$this->writeList($listItems, static::LIST_TYPE_UL, $loose);
+		if (!$loose) {
+			$this->nl();
+		}
+		return $this;
+	}
+
+	/**
+	 * Write an ordered list
+	 * @param  array   $listItems
+	 * @param  boolean $loose
+	 * @return $this
+	 */
+	public function ol(array $listItems, $loose = false) {
+		$this->addNewlineIfMarkdownNotEmpty();
+		$this->writeList($listItems, static::LIST_TYPE_OL, $loose);
+		if (!$loose) {
+			$this->nl();
+		}
+		return $this;
+	}
+
+	/**
+	 * Write an ordered or unordered list
+	 * Supports nested lists in the form of arrays
+	 * Ex
+	 * [
+	 * 		"item1",
+	 * 		"item2",
+	 * 		[
+	 * 			"nestedItem1",
+	 * 			"nestedItem2",
+	 * 			"etc..."
+	 * 		]
+	 * ]
+	 * @param  array   $listItems array of list items
+	 * @param  string  $type      one of the list type constants
+	 * @param  boolean $loose     is this a loose list - meaning blank lines between items
+	 * @param  integer $numTabs   the number of tabs to indent items in this list
+	 * @return $this
+	 */
+	protected function writeList(array $listItems, $type, $loose = false, $numTabs = 0) {
+		if (!in_array($type, [static::LIST_TYPE_UL, static::LIST_TYPE_OL])) {
+			throw new \InvalidArgumentException("Invalid list type provided");
+		}
+		if (empty($listItems)) {
+			return $this;
+		}
+		$olNumber = 1;
+		foreach ($listItems as $item) {
+			if (is_array($item)) {
+				$this->writeList($item, $type, $loose, ($numTabs + 1));
+			} else {
+				if ($type === static::LIST_TYPE_UL) {
+					$this->ulItem($item, $numTabs);
+				} else {
+					$this->olItem($item, $numTabs, $olNumber);
+					$olNumber++;
+				}
+				if ($loose) {
+					$this->nl();
+				}
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Write an unordered list item applying the provided number of tabs
+	 * @param  string  $string 
+	 * @param  integer $numTabs
+	 * @return $this
+	 */
+	public function ulItem($string, $numTabs = 0) {
+		return $this->write($this->applyTabsToListItem("- $string", $numTabs))->nl();
+	}
+
+	/**
+	 * Write an ordered list item applying the provided number of tabs
+	 * @param  string  $string 
+	 * @param  string  $listItemNumber
+	 * @param  integer $numTabs
+	 * @return $this
+	 */
+	public function olItem($string, $numTabs = 0, $listItemNumber = "1") {
+		$listItemNumber = (string)$listItemNumber;
+		return $this->write($this->applyTabsToListItem("$listItemNumber. $string", $numTabs))->nl();
+	}
+
+	/**
+	 * Apply the provided number of tabs to the list item string
+	 * @param  string  $string  
+	 * @param  integer $numTabs 
+	 * @return string
+	 */
+	protected function applyTabsToListItem($string, $numTabs = 0) {
+		$string = (string)$string;
+		if ($numTabs) {
+			$spaces = "";
+			for ($i = 0; $i < $numTabs; $i++) {
+				$spaces .= "    ";
+			}
+			return $spaces . $string;
+		}
+		return $string;
+	}
+
+	/**
+	 * Get the markdown string
+	 * @return string
+	 */
 	public function __toString() {
 		return $this->markdown();
 	}
