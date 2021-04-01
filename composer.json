@@ -1,0 +1,17 @@
+{
+    "name": "ckunkle/markdown-writer",
+    "description": "Library for generating markdown files",
+    "type": "library",
+    "license": "MIT",
+    "scripts": {
+        "test": "\"vendor/bin/phpunit\" --testsuite \"all\""
+    },
+    "autoload": {
+        "psr-4": {
+            "MarkdownWriter\\": "./src"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4"
+    }
+}
