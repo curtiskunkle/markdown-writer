@@ -331,6 +331,29 @@ class Writer {
 		return $string;
 	}
 
+	public function blockQuote($arg) {
+		$string = "";
+		if (is_callable($arg)) {
+			$md = new self();
+			$arg($md);
+			$string = $md->__toString();
+		} else {
+			$string = (string)$arg;
+		}
+		
+		$converted = $this->convertStringToBlockquote($string);
+		print_r($md);die;
+	}
+
+	protected function convertStringToBlockquote($string) {
+		$parts = explode($this->eol, $string);
+		$parts = array_map(function($item) {
+			$item = (string)$item;
+			return "> $item"; 
+		}, $parts);
+		return implode($this->eol, $parts);
+	}
+
 	/**
 	 * Get the markdown string
 	 * @return string
