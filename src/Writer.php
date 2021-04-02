@@ -83,6 +83,14 @@ class Writer {
 	}
 
 	/**
+	 * Get the EOL char
+	 * @return string
+	 */
+	public function eol() {
+		return $this->eol;
+	}
+
+	/**
 	 * Append a newline char
 	 * @return $this
 	 */
@@ -331,20 +339,46 @@ class Writer {
 		return $string;
 	}
 
+	/**
+	 * Write a blockquote
+	 *
+	 * This accepts 3 different argument types for readability/flexibility
+	 * 
+	 * 1. string - just converts to block quote
+	 * 2. array - creates a multi line string by imploding on the EOL char, then converts
+	 * 2. callable - creates an instance of Writer and passes it to the callback, 
+	 *               then converts the generated markdown from the created writer
+	 *               
+	 * @param  mixed $arg
+	 * @return $this
+	 */
 	public function blockQuote($arg) {
 		$string = "";
 		if (is_callable($arg)) {
 			$md = new self();
 			$arg($md);
-			$string = $md->__toString();
+			$string = rtrim($md->__toString(), $this->eol);
+		} elseif (is_array($arg)) {
+			$string = implode($this->eol, array_map(function($item) {
+				return (string)$item;
+			}, $arg));
 		} else {
 			$string = (string)$arg;
 		}
 		
 		$converted = $this->convertStringToBlockquote($string);
-		print_r($md);die;
+		return $this->block($converted);
 	}
 
+	/**
+	 * Converts a string to a blockquote by 
+	 * 1. exploding on the EOL char
+	 * 2. prepending > to each line
+	 * 3. imploding on the EOL char
+	 * 
+	 * @param  string $string
+	 * @return string
+	 */
 	protected function convertStringToBlockquote($string) {
 		$parts = explode($this->eol, $string);
 		$parts = array_map(function($item) {
