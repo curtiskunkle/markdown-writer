@@ -53,6 +53,14 @@ class Writer {
 	}
 
 	/**
+	 * Create an inline code
+	 * @return string
+	 */
+	public function code($string) {
+		return "`$string`";
+	}
+
+	/**
 	 * Create an inline strikethrough
 	 * @return string
 	 */
