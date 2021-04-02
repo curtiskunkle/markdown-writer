@@ -153,4 +153,64 @@ class WriterTest extends \PHPUnit\Framework\TestCase {
             "- item 2"
         );
     }
+
+    public function testUlLoose() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ul([
+            "item 1",
+            "item 2"
+        ], true);
+        $this->assertEquals($md->__toString(), 
+            "- item 1" . $md->eol() . $md->eol() .
+            "- item 2"
+        );
+    }
+
+    public function testUlNested() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ul([
+            "item 1",
+            "item 2",
+            [
+                "nest 1",
+                "nest 2",
+                [
+                    "nest 3",
+                    "nest 4"
+                ]
+            ]
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "- item 1" . $md->eol() .
+            "- item 2" . $md->eol() .
+            "    - nest 1" . $md->eol() .
+            "    - nest 2" . $md->eol() .
+            "        - nest 3" . $md->eol() .
+            "        - nest 4"
+        );
+    }
+
+    public function testUlNestedLoose() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ul([
+            "item 1",
+            "item 2",
+            [
+                "nest 1",
+                "nest 2",
+                [
+                    "nest 3",
+                    "nest 4"
+                ]
+            ]
+        ], true);
+        $this->assertEquals($md->__toString(), 
+            "- item 1" . $md->eol() . $md->eol() .
+            "- item 2" . $md->eol() . $md->eol() .
+            "    - nest 1" . $md->eol() . $md->eol() .
+            "    - nest 2" . $md->eol() . $md->eol() .
+            "        - nest 3" . $md->eol() . $md->eol() .
+            "        - nest 4"
+        );
+    }
 }
