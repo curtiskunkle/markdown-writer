@@ -37,10 +37,28 @@ class Writer {
 	}
 
 	/**
-	 * Create an inline link
-	 * @param  string $string
+	 * Create an inline superscript
 	 * @return string
 	 */
+	public function superscript($string) {
+		return "^$string^";
+	}
+
+	/**
+	 * Create an inline subscript
+	 * @return string
+	 */
+	public function subscript($string) {
+		return "~$string~";
+	}
+
+	/**
+	 * Create an inline strikethrough
+	 * @return string
+	 */
+	public function strikethrough($string) {
+		return "~~$string~~";
+	}
 	
 	/**
 	 * Create an inline link
@@ -413,6 +431,67 @@ class Writer {
 		$text .= $this->eol;
 		$text .= "```";
 		return $this->block($text);
+	}
+
+	/**
+	 * Writes a table
+	 *
+	 * Expects an array of arrays where the first array is the table columns
+	 * and the remaining arrays are the table rows
+	 *
+	 * Ex
+	 * [
+	 * 		["header1", "header2"],
+	 * 		["val1", "val2"],
+	 * 		["etc", "..."],
+	 * ]
+	 * 
+	 * @param  array  $table
+	 * @return $this
+	 */
+	public function table(array $table) {
+		//validate
+		if (empty($table)) return $this;
+		foreach ($table as $row) {
+			if (!is_array($row)) {
+				throw new \InvalidArgumentException("Argument passed to table must be array of arrays");
+			}
+		}
+
+		$table = array_values($table);
+
+		//format
+		$cellLength = 3; //min
+		foreach ($table as $key => $row) {
+			foreach ($row as $subKey => $str) {
+				$table[$key][$subKey] = (string)$str;
+				if (strlen($table[$key][$subKey]) > $cellLength) {
+					$cellLength = strlen($table[$key][$subKey]);
+				}
+			}
+		}
+
+		//header
+		$tableStr = "|" . implode("|", array_map(function($item) use ($cellLength) {
+			return str_pad($item, $cellLength);
+		}, $table[0])) . "|" . $this->eol;
+		$tableStr .= "|";
+		for ($i = 0; $i < count($table[0]); $i++) {
+			$tableStr .= str_pad("", $cellLength, "-") . "|";
+		}
+		$tableStr .= $this->eol;
+
+		foreach ($table as $key => $row) {
+			if ($key === 0) continue;
+			$tableStr .= "|" . implode("|", array_map(function($item) use ($cellLength) {
+				return str_pad($item, $cellLength);
+			}, $row)) . "|";
+			if ($key !== count($table) - 1) {
+				$tableStr .= $this->eol;
+			}
+		}
+
+		return $this->block($tableStr);
 	}
 
 	/**
