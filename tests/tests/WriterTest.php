@@ -285,4 +285,61 @@ class WriterTest extends \PHPUnit\Framework\TestCase {
             "        2. nest 4"
         );
     }
+
+    public function testBlockQuoteString() {
+
+        $md = new \MarkdownWriter\Writer();
+
+        $text = 
+"This is some text for a block quote
+
+It has multiple lines and some " . $md->bold("emphasis");
+
+        $md->blockQuote($text);
+        $this->assertEquals($md->__toString(), 
+"> This is some text for a block quote
+> 
+> It has multiple lines and some **emphasis**"
+        );
+    }
+
+    public function testBlockQuoteArray() {
+
+        $md = new \MarkdownWriter\Writer();
+
+        $md->blockQuote([
+            "This block quote uses an array argument",
+            "",
+            "but still gets the job done",
+        ]);
+        $this->assertEquals($md->__toString(), 
+"> This block quote uses an array argument
+> 
+> but still gets the job done"
+        );
+    }
+
+    public function testBlockQuoteClosure() {
+
+        $md = new \MarkdownWriter\Writer();
+
+        $md->blockQuote(function($md) {
+            $md->p("This blockquote uses a callback")
+            ->p("This allows us to use the writer's functionality to create content")
+            ->blockQuote([
+                "including",
+                "blockQuotes"
+            ]);
+        })->h3("This enables us to write nested blockquotes");
+        $this->assertEquals($md->__toString(), 
+"> This blockquote uses a callback
+> 
+> This allows us to use the writer's functionality to create content
+> 
+> > including
+> > blockQuotes
+
+### This enables us to write nested blockquotes"
+        );
+    }
 }
