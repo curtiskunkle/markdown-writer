@@ -221,7 +221,7 @@ class Writer {
 	 * @return string
 	 */
 	public function markdown() {
-		return $this->markdown;
+		return rtrim($this->markdown, $this->eol);
 	}
 
 	/**
@@ -357,7 +357,7 @@ class Writer {
 		if (is_callable($arg)) {
 			$md = new self();
 			$arg($md);
-			$string = rtrim($md->__toString(), $this->eol);
+			$string = $md->__toString();
 		} elseif (is_array($arg)) {
 			$string = implode($this->eol, array_map(function($item) {
 				return (string)$item;
@@ -386,6 +386,33 @@ class Writer {
 			return "> $item"; 
 		}, $parts);
 		return implode($this->eol, $parts);
+	}
+
+	/**
+	 * Write a "fenced" code block
+	 * 
+	 * @param  mixed $arg  string or array representing the code to render
+	 * @param  string $lang optional language arg for flavors that support syntax highlighting
+	 * @return $this
+	 */
+	public function codeBlock($arg, $lang = "") {
+		if (is_array($arg)) {
+			$string = implode($this->eol, array_map(function($item) {
+				return (string)$item;
+			}, $arg));
+		} else {
+			$string = (string)$arg;
+		}
+
+		$text = "```";
+		if ($lang) {
+			$text .= (string)$lang;
+		}
+		$text .= $this->eol;
+		$text .= $string;
+		$text .= $this->eol;
+		$text .= "```";
+		return $this->block($text);
 	}
 
 	/**
