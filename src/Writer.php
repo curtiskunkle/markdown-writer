@@ -259,9 +259,6 @@ class Writer {
 	public function ul(array $listItems, $loose = false) {
 		$this->addNewlineIfMarkdownNotEmpty();
 		$this->writeList($listItems, static::LIST_TYPE_UL, $loose);
-		if (!$loose) {
-			$this->nl();
-		}
 		return $this;
 	}
 
@@ -274,9 +271,6 @@ class Writer {
 	public function ol(array $listItems, $loose = false) {
 		$this->addNewlineIfMarkdownNotEmpty();
 		$this->writeList($listItems, static::LIST_TYPE_OL, $loose);
-		if (!$loose) {
-			$this->nl();
-		}
 		return $this;
 	}
 

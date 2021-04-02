@@ -342,4 +342,167 @@ It has multiple lines and some " . $md->bold("emphasis");
 ### This enables us to write nested blockquotes"
         );
     }
+
+    public function testCodeBlockString() {
+        $md = new \MarkdownWriter\Writer();
+
+        $md->codeBlock("This is some code");
+        $this->assertEquals($md->__toString(), 
+            "```" . $md->eol() .
+            "This is some code" . $md->eol() .
+            "```"
+        );
+    }
+
+    public function testCodeBlockStringWithLanguage() {
+        $md = new \MarkdownWriter\Writer();
+
+        $md->codeBlock("This is some code", "php");
+        $this->assertEquals($md->__toString(), 
+            "```php" . $md->eol() .
+            "This is some code" . $md->eol() .
+            "```"
+        );
+    }
+
+    public function testCodeBlockArray() {
+        $md = new \MarkdownWriter\Writer();
+
+        $md->codeBlock([
+            "this is some code",
+            "",
+            "but this uses an array to write the block"
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "```" . $md->eol() .
+            "this is some code" . $md->eol() . $md->eol() .
+            "but this uses an array to write the block" . $md->eol() .
+            "```"
+        );
+    }
+
+    public function testCodeBlockArrayWithLanguage() {
+        $md = new \MarkdownWriter\Writer();
+
+        $md->codeBlock([
+            "this is some code",
+            "",
+            "but this uses an array to write the block"
+        ], "php");
+        $this->assertEquals($md->__toString(), 
+            "```php" . $md->eol() .
+            "this is some code" . $md->eol() . $md->eol() .
+            "but this uses an array to write the block" . $md->eol() .
+            "```"
+        );
+    }
+
+    public function testTable() {
+        $md = new \MarkdownWriter\Writer();
+        $md->table([
+            ["c1", "c2", "c3"]
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "|c1 |c2 |c3 |" . $md->eol() .
+            "|---|---|---|"
+        );
+
+        $md = new \MarkdownWriter\Writer();
+        $md->table([
+            ["c1", "column2", "c3"]
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "|c1     |column2|c3     |" . $md->eol() .
+            "|-------|-------|-------|"
+        );
+
+        $md = new \MarkdownWriter\Writer();
+        $md->table([
+            ["c1", "column2", "c3"],
+            ["val1", "val2", "val3"],
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "|c1     |column2|c3     |" . $md->eol() .
+            "|-------|-------|-------|" . $md->eol() . 
+            "|val1   |val2   |val3   |"
+        );
+    }
+
+    public function testFullExample() {
+        $md = new \MarkdownWriter\Writer();
+        $md
+        ->h1("Full Example")
+        ->p("This is a paragraph")
+        ->p("This is a paragraph too")
+        ->p(
+            $md->bold("bold") . " " .
+            $md->italic("italic") . " " .
+            $md->superscript("superscript") . " " .
+            $md->subscript("subscript") . " " .
+            $md->code("code") . " " .
+            $md->strikethrough("strikethrough") . " " .
+            $md->link("My Link", "a/path") . " " .
+            $md->image("My Image", "another/path")
+        )
+        ->write("just appending some text")
+        ->hr()
+        ->block("This is some text in a block")
+        ->ul([
+            "item1",
+            "item2",
+            [
+                "nested1",
+                "nested2",
+            ],
+        ])
+        ->ol([
+            "item1",
+            "item2",
+            [
+                "nested1",
+                "nested2",
+            ],
+        ])
+        ->blockQuote([
+            "here is a  ",
+            "blockquote",
+        ])
+        ->codeBlock([
+            "here is a code block"
+        ], "php")
+        ->table([
+            ["col1", "col2", "col3"],
+            ["val1", "val2", "val3"],
+            ["val1", "val2", "val3"],
+            ["val1", "val2", "val3"],
+        ]);
+        print_r((string)$md);die;
+        $this->assertEquals($md->__toString(), 
+            "# Full Example" . $md->eol() . $md->eol() .
+            "This is a paragraph" . $md->eol() . $md->eol() .
+            "This is a paragraph too" . $md->eol() . $md->eol() .
+            "**bold** *italic* ^superscript^ ~subscript~ `code` ~~strikethrough~~ [My Link](a/path) ![My Image](another/path)" . $md->eol() . 
+            "just appending some text" . $md->eol() .
+            "---" . $md->eol() . $md->eol() .
+            "This is some text in a block" . $md->eol() . $md->eol() .
+            "- item1" . $md->eol() .
+            "- item2" . $md->eol() .
+            "    - nested1" . $md->eol() .
+            "    - nested2" . $md->eol() . $md->eol() . 
+            "1. item1" . $md->eol() .
+            "2. item2" . $md->eol() .
+            "    1. nested1" . $md->eol() .
+            "    2. nested2" . $md->eol() . $md->eol() .
+            "> here is a  " . $md->eol() .
+            "> blockquote" . $md->eol() . $md->eol() .
+            "```php" . $md->eol() .
+            "here is a code block" . $md->eol() .
+            "```" . $md->eol() . $md->eol() .
+            "|col1|col2|col3|" . $md->eol() .
+            "|----|----|----|" . $md->eol() .
+            "|val1|val2|val3|" . $md->eol() .
+            "|val1|val2|val3|" . $md->eol() .
+            "|val1|val2|val3|"
+        );
+    }
 }
