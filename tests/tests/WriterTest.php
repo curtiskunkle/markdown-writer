@@ -121,4 +121,36 @@ class WriterTest extends \PHPUnit\Framework\TestCase {
             "thing 2"
         );
     }
+
+    public function testWritingListItems() {
+        $md = new \MarkdownWriter\Writer();
+        $md
+        ->ulItem("item")
+        ->ulItem("item", 1)
+        ->ulItem("item", 2)
+        ->olItem("item")
+        ->olItem("item", 1, "12")
+        ->olItem("item", 2, "3");
+
+        $this->assertEquals($md->__toString(), 
+            "- item" . $md->eol() .
+            "    - item" . $md->eol() .
+            "        - item" . $md->eol() .
+            "1. item" . $md->eol() .
+            "    12. item" . $md->eol() .
+            "        3. item"
+        );
+    }
+
+    public function testUl() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ul([
+            "item 1",
+            "item 2"
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "- item 1" . $md->eol() .
+            "- item 2"
+        );
+    }
 }
