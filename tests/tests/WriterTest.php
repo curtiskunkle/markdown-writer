@@ -213,4 +213,76 @@ class WriterTest extends \PHPUnit\Framework\TestCase {
             "        - nest 4"
         );
     }
+
+    public function testOl() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ol([
+            "item 1",
+            "item 2"
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "1. item 1" . $md->eol() .
+            "2. item 2"
+        );
+    }
+
+    public function testOlLoose() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ol([
+            "item 1",
+            "item 2"
+        ], true);
+        $this->assertEquals($md->__toString(), 
+            "1. item 1" . $md->eol() . $md->eol() .
+            "2. item 2"
+        );
+    }
+
+    public function testOlNested() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ol([
+            "item 1",
+            "item 2",
+            [
+                "nest 1",
+                "nest 2",
+                [
+                    "nest 3",
+                    "nest 4"
+                ]
+            ]
+        ]);
+        $this->assertEquals($md->__toString(), 
+            "1. item 1" . $md->eol() .
+            "2. item 2" . $md->eol() .
+            "    1. nest 1" . $md->eol() .
+            "    2. nest 2" . $md->eol() .
+            "        1. nest 3" . $md->eol() .
+            "        2. nest 4"
+        );
+    }
+
+    public function testOlNestedLoose() {
+        $md = new \MarkdownWriter\Writer();
+        $md->ol([
+            "item 1",
+            "item 2",
+            [
+                "nest 1",
+                "nest 2",
+                [
+                    "nest 3",
+                    "nest 4"
+                ]
+            ]
+        ], true);
+        $this->assertEquals($md->__toString(), 
+            "1. item 1" . $md->eol() . $md->eol() .
+            "2. item 2" . $md->eol() . $md->eol() .
+            "    1. nest 1" . $md->eol() . $md->eol() .
+            "    2. nest 2" . $md->eol() . $md->eol() .
+            "        1. nest 3" . $md->eol() . $md->eol() .
+            "        2. nest 4"
+        );
+    }
 }
