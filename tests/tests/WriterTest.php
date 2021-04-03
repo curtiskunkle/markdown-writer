@@ -476,7 +476,7 @@ It has multiple lines and some " . $md->bold("emphasis");
             ["val1", "val2", "val3"],
             ["val1", "val2", "val3"],
         ]);
-        print_r((string)$md);die;
+        
         $this->assertEquals($md->__toString(), 
             "# Full Example" . $md->eol() . $md->eol() .
             "This is a paragraph" . $md->eol() . $md->eol() .
