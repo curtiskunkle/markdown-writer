@@ -19,15 +19,45 @@ $md
 ])
 ->h3("Intallation")
 ->codeBlock("composer require ckunkle/markdownwriter", "bash")
-->h1("API")
-->h5("Intantiate a markdown writer")
+->h3("Example Usage")
 ->codeBlock([
 	"<?php",
+	"require_once(\"vendor/autoload.php\");",
 	"",
-	"require_once(\"path/to/vendor/autoload.php\")",
-	"",
-	"\$md = new \MarkdownWriter\Writer();"
-], "php");
+	"\$md = new \MarkdownWriter\Writer();",
+	"\$md->h1(\"Example Markdown\")",
+	"->p(\"This class makes generating markdown using PHP quick and convenient\")",
+	"->ol([",
+	"    \"Here is\",",
+	"    \"An ordered list\",",
+	"    \"With\",",
+	"    [",
+	"        \"Nested\",",
+	"        [",
+	"            \"Sublists\"",
+	"        ],",
+	"    ],",
+	"])",
+	"->blockQuote(\"View the API documentation below to learn more features\");",
+], "php")
+->codeBlock((string)(new \MarkdownWriter\Writer())
+	->h1("Example Markdown")
+	->p("This class makes generating markdown using PHP quick and convenient")
+	->ol([
+		"Here is",
+		"An ordered list",
+		"With",
+		[
+			"Nested",
+			[
+				"Sublists"
+			]
+		]
+	])
+	->blockQuote("View the API documentation below to learn more features")
+, "markdown")
+->p("For a more elaborate example, view " . $md->link("the script", "gendocs.php") . " that generated this README file.")
+->h1("API");
 
 $map = [
 	"Inline Methods" => [

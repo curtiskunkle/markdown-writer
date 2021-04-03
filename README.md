@@ -17,17 +17,46 @@ A library for generating markdown using PHP. This library provides a class for b
 composer require ckunkle/markdownwriter
 ```
 
-# API
-
-##### Intantiate a markdown writer
+### Example Usage
 
 ```php
 <?php
-
-require_once("path/to/vendor/autoload.php")
+require_once("vendor/autoload.php");
 
 $md = new \MarkdownWriter\Writer();
+$md->h1("Example Markdown")
+->p("This class makes generating markdown using PHP quick and convenient")
+->ol([
+    "Here is",
+    "An ordered list",
+    "With",
+    [
+        "Nested",
+        [
+            "Sublists"
+        ],
+    ],
+])
+->blockQuote("View the API documentation below to learn more features");
 ```
+
+```markdown
+# Example Markdown
+
+This class makes generating markdown using PHP quick and convenient
+
+1. Here is
+2. An ordered list
+3. With
+    1. Nested
+        1. Sublists
+
+> View the API documentation below to learn more features
+```
+
+For a more elaborate example, view [the script](gendocs.php) that generated this README file.
+
+# API
 
 ## Inline Methods
 
